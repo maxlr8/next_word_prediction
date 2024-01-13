@@ -1,0 +1,113 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %} Dashboard {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<style>
+  .suggestion {
+    margin-right: 2rem;
+  }
+  .suggestion:nth-child(1) {
+    background-color: #73A9AD;
+  }
+  .suggestion:nth-child(2) {
+    background-color: #90C8AC;
+  }
+  .suggestion:nth-child(3) {
+    background-color: #C4DFAA;
+  }
+  .suggestion:last-child {
+    background-color: #8392AB;
+  }
+</style>
+{% csrf_token %}
+<div class="container-fluid py-4">
+  <div class="row d-flex">
+    <div class="col-lg-4">
+      <div class="hero-banner__img">
+        <img class="img-fluid" src="{{ ASSETS_ROOT }}/img/undraw_reading_time_re_phf7.svg" alt="">
+      </div>
+    </div>
+    <div class="col-lg-8 pt-5">
+      <form id="form" class="form-group shadow-textarea">
+          <textarea name="message" class="form-control z-depth-1 predict-text" id="inputTextArea" rows="3" placeholder="Write something here..."></textarea>
+      </form>
+    
+      <div id="messages"></div>
+    
+      <script type="text/javascript">
+          let url = `ws://${window.location.host}/ws/socket-server/`
+
+          const nwpSocket = new WebSocket(url)
+
+          nwpSocket.onmessage = function(e){
+              let data = JSON.parse(e.data)
+              console.log('Data:', data)
+
+              if(data.type === 'chat'){
+                var words = data.message;
+                var openBtn = '<button type="button" class="suggestion btn btn-secondary" data-obj='+data.objectId+'>';
+                var closeBtn = '</button>'
+                var wordElements = openBtn + words.join(closeBtn+openBtn) + closeBtn + openBtn + 'None' + closeBtn;
+                $('#messages').html(wordElements);
+
+                $('#messages button').on('click', function(e){
+                  if(e.target.textContent !== 'None') {
+                    $('.predict-text').val($('.predict-text').val() + ' ' + e.target.textContent);
+                  } else {
+                    $('#messages').html(' ');
+                  }
+                  var objId = $(this).data('obj');
+                  var selectedWord = e.target.textContent;
+                  $.ajax({
+                    type:'POST',
+                    url:window.location.pathname,
+                    data: {'objectId':objId, 'selectedWord':selectedWord, 'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()},
+                    success: function(){
+                      console.log('Saved the selected word to database.')
+                    }
+
+                  })
+                });
+              }
+          }
+
+          let form = document.getElementById('form')
+
+          form.addEventListener('submit', (e)=> {
+              e.preventDefault()
+              let message = e.target.message.value 
+              nwpSocket.send(JSON.stringify({
+                  'message':message
+              }))
+              form.reset()
+          });
+
+          $('#form textarea').on('keydown',function(e){
+            if(e.keyCode == 32 || e.keyCode == 0){
+              let message = $('.predict-text').val();
+              nwpSocket.send(JSON.stringify({
+                  'message':message
+              }));
+            }
+
+            var textarea = document.getElementById('inputTextArea');
+            var hasVerticalScrollbar = textarea.scrollHeight > textarea.clientHeight;
+            while(textarea.scrollHeight > textarea.clientHeight){
+              textarea.style.height = textarea.offsetHeight + 10 +'px' ;
+            }
+          });
+      </script>
+    </div>
+  </div>
+
+  {% include "includes/footer.html" %}
+
+</div>
+
+{% endblock content %}

@@ -1,0 +1,36 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %} Dashboard {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script> 
+
+
+    <div class="container-fluid py-4">
+      <div class="row d-flex">
+        <div class="col-lg-6 pt-5">
+          <div class="hero-banner__content">
+            <h1>Welcome to <br/>Next Word Predictor</h1>
+            <p></p>
+            <a class="btn bg-gradient-primary w-30 px-3 mt-3 mb-2 active" href="/nwp">Get Started</a>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="hero-banner__img">
+            <img class="img-fluid" src="{{ ASSETS_ROOT }}/img/undraw_projections_re_ulc6.svg" alt="">
+          </div>
+        </div>
+      </div>
+
+      {% include "includes/footer.html" %}
+
+    </div>
+
+{% endblock content %}
+
+{% block javascripts %}
+
+{% endblock javascripts %}
