@@ -2,6 +2,7 @@
 
 The Next-Word Predictor is a full end-to-end Django-based AI application that continually suggests upcoming words as the user types giving user specific metrics on typing along with login and authentication features.
 
+
 Installing Virtual Environment :
 
 `pip3 install virtualenv`
